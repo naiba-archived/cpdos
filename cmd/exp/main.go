@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
@@ -13,8 +12,8 @@ var (
 	methods  []string
 	mainwin  *ui.Window
 	etURL    *ui.Entry
-	meBefore *ui.Label
-	meAfter  *ui.Label
+	meBefore *ui.MultilineEntry
+	meAfter  *ui.MultilineEntry
 )
 
 func init() {
@@ -26,7 +25,7 @@ func init() {
 }
 
 func setupUI() {
-	mainwin = ui.NewWindow("CPDoS Test Tool", 300, 100, true)
+	mainwin = ui.NewWindow("CPDoS Test Tool", 300, 200, true)
 	mainwin.SetMargined(true)
 	mainwin.OnClosing(func(*ui.Window) bool {
 		mainwin.Destroy()
@@ -66,17 +65,19 @@ func setupUI() {
 	btnVerify.OnClicked(onClick)
 	vbox.Append(btnVerify, false)
 
-	gBefore := ui.NewGroup("Before")
-	gBefore.SetMargined(true)
-	meBefore = ui.NewLabel("")
-	gBefore.SetChild(meBefore)
-	vbox.Append(gBefore, false)
+	fmBefore := ui.NewForm()
+	fmBefore.SetPadded(true)
+	meBefore = ui.NewMultilineEntry()
+	meBefore.SetReadOnly(true)
+	fmBefore.Append("Before", meBefore, true)
+	vbox.Append(fmBefore, true)
 
-	gAfter := ui.NewGroup("After")
-	gAfter.SetMargined(true)
-	meAfter = ui.NewLabel("")
-	gAfter.SetChild(meAfter)
-	vbox.Append(gAfter, false)
+	fmAfter := ui.NewForm()
+	fmAfter.SetPadded(true)
+	meAfter = ui.NewMultilineEntry()
+	meAfter.SetReadOnly(true)
+	fmAfter.Append("   After", meAfter, true)
+	vbox.Append(fmAfter, true)
 
 	mainwin.Show()
 }
@@ -86,18 +87,16 @@ func onClick(b *ui.Button) {
 	exp := internal.NewCPDoSExp(etURL.Text())
 	go func() {
 		body, status := exp.Get()
-		str := fmt.Sprintf("[%d]%s", status, body)
+		str := fmt.Sprintf("[%d]%s\n", status, body)
 		ui.QueueMain(func() {
-			meBefore.SetText(str)
+			meBefore.Append(str)
 		})
-		log.Println(str)
-		body, status = exp.HHO(20)
-		str = fmt.Sprintf("[%d]%s", status, body)
+		body, status = exp.HHO(250)
+		str = fmt.Sprintf("[%d]%s\n", status, body)
 		ui.QueueMain(func() {
-			meAfter.SetText(str)
+			meAfter.Append(str)
 			b.Enable()
 		})
-		log.Println(str)
 	}()
 }
 
