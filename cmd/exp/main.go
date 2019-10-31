@@ -1,13 +1,20 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
+	"github.com/naiba/cpdos/internal"
 )
 
 var (
-	methods []string
-	mainwin *ui.Window
+	methods  []string
+	mainwin  *ui.Window
+	etURL    *ui.Entry
+	meBefore *ui.Label
+	meAfter  *ui.Label
 )
 
 func init() {
@@ -38,7 +45,7 @@ func setupUI() {
 	urlBox := ui.NewHorizontalBox()
 	urlBox.SetPadded(true)
 	lbURL := ui.NewLabel("Website URL")
-	etURL := ui.NewEntry()
+	etURL = ui.NewEntry()
 	urlBox.Append(lbURL, false)
 	urlBox.Append(etURL, true)
 	vbox.Append(urlBox, false)
@@ -59,12 +66,39 @@ func setupUI() {
 	btnVerify.OnClicked(onClick)
 	vbox.Append(btnVerify, false)
 
+	gBefore := ui.NewGroup("Before")
+	gBefore.SetMargined(true)
+	meBefore = ui.NewLabel("")
+	gBefore.SetChild(meBefore)
+	vbox.Append(gBefore, false)
+
+	gAfter := ui.NewGroup("After")
+	gAfter.SetMargined(true)
+	meAfter = ui.NewLabel("")
+	gAfter.SetChild(meAfter)
+	vbox.Append(gAfter, false)
+
 	mainwin.Show()
 }
 
 func onClick(b *ui.Button) {
 	b.Disable()
-	ui.MsgBox(mainwin, "Hola", "You clicked the button!")
+	exp := internal.NewCPDoSExp(etURL.Text())
+	go func() {
+		body, status := exp.Get()
+		str := fmt.Sprintf("[%d]%s", status, body)
+		ui.QueueMain(func() {
+			meBefore.SetText(str)
+		})
+		log.Println(str)
+		body, status = exp.HHO(20)
+		str = fmt.Sprintf("[%d]%s", status, body)
+		ui.QueueMain(func() {
+			meAfter.SetText(str)
+			b.Enable()
+		})
+		log.Println(str)
+	}()
 }
 
 func main() {
