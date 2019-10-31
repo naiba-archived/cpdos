@@ -7,6 +7,7 @@ import (
 
 var (
 	methods []string
+	mainwin *ui.Window
 )
 
 func init() {
@@ -18,7 +19,7 @@ func init() {
 }
 
 func setupUI() {
-	mainwin := ui.NewWindow("CPDoS Test Tool", 300, 100, true)
+	mainwin = ui.NewWindow("CPDoS Test Tool", 300, 100, true)
 	mainwin.SetMargined(true)
 	mainwin.OnClosing(func(*ui.Window) bool {
 		mainwin.Destroy()
@@ -55,12 +56,15 @@ func setupUI() {
 	vbox.Append(methodBox, false)
 
 	btnVerify := ui.NewButton("Verify")
-	btnVerify.OnClicked(func(btn *ui.Button) {
-		ui.MsgBox(mainwin, "Hola", "You clicked the button!")
-	})
+	btnVerify.OnClicked(onClick)
 	vbox.Append(btnVerify, false)
 
 	mainwin.Show()
+}
+
+func onClick(b *ui.Button) {
+	b.Disable()
+	ui.MsgBox(mainwin, "Hola", "You clicked the button!")
 }
 
 func main() {
