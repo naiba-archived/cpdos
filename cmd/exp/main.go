@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
@@ -12,6 +13,8 @@ var (
 	methods  []string
 	mainwin  *ui.Window
 	etURL    *ui.Entry
+	etParam  *ui.Entry
+	cbMethod *ui.Combobox
 	meBefore *ui.MultilineEntry
 	meAfter  *ui.MultilineEntry
 )
@@ -52,7 +55,7 @@ func setupUI() {
 	methodBox := ui.NewHorizontalBox()
 	methodBox.SetPadded(true)
 	lbMethod := ui.NewLabel("CPDoS Type")
-	cbMethod := ui.NewCombobox()
+	cbMethod = ui.NewCombobox()
 	for i := 0; i < len(methods); i++ {
 		cbMethod.Append(methods[i])
 	}
@@ -60,6 +63,14 @@ func setupUI() {
 	methodBox.Append(lbMethod, false)
 	methodBox.Append(cbMethod, true)
 	vbox.Append(methodBox, false)
+
+	paramBox := ui.NewHorizontalBox()
+	paramBox.SetPadded(true)
+	lbParam := ui.NewLabel("Param")
+	etParam = ui.NewEntry()
+	paramBox.Append(lbParam, false)
+	paramBox.Append(etParam, true)
+	vbox.Append(paramBox, false)
 
 	btnVerify := ui.NewButton("Verify")
 	btnVerify.OnClicked(onClick)
@@ -91,7 +102,15 @@ func onClick(b *ui.Button) {
 		ui.QueueMain(func() {
 			meBefore.Append(str)
 		})
-		body, status = exp.HHO(250)
+		switch cbMethod.Selected() {
+		case 0:
+			num, _ := strconv.ParseInt(etParam.Text(), 10, 64)
+			body, status = exp.HHO(num)
+		case 1:
+			body, status = exp.HMC(etParam.Text())
+		case 2:
+			body, status = exp.HMO()
+		}
 		str = fmt.Sprintf("[%d]%s\n", status, body)
 		ui.QueueMain(func() {
 			meAfter.Append(str)

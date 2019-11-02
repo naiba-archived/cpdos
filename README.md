@@ -2,6 +2,11 @@
 
 CPDoS: Cache Poisoned Denial of Service exp
 
-![Xnip2019-11-01_00-06-25.png](https://i.loli.net/2019/11/01/3M7brJO4Gtd6iSp.png)
+![test.PNG](https://i.loli.net/2019/11/02/4jmctKA6ksS3bug.png)
+
+- HHO
+    - param: the num of large headers to add. `eg:200`
+- HMC
+    - param: the character to add to header. `eg:\a \r \n`
 
 By testing my own website, I found that it didn't work.
