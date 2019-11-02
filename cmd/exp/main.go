@@ -109,7 +109,7 @@ func onClick(b *ui.Button) {
 		case 1:
 			body, status = exp.HMC(etParam.Text())
 		case 2:
-			body, status = exp.HMO()
+			body, status = exp.HMO(etParam.Text())
 		}
 		str = fmt.Sprintf("[%d]%s\n", status, body)
 		ui.QueueMain(func() {

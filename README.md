@@ -8,5 +8,7 @@ CPDoS: Cache Poisoned Denial of Service exp
     - param: the num of large headers to add. `eg:200`
 - HMC
     - param: the character to add to header. `eg:\a \r \n`
+- HMO
+    - param: the method to override. `eg:DELETE`
 
 By testing my own website, I found that it didn't work.

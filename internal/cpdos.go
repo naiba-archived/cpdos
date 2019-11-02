@@ -50,8 +50,12 @@ func (ce *CPDoSExp) HMC(str string) (string, int) {
 }
 
 // HMO HTTP Method Override
-func (ce *CPDoSExp) HMO() (string, int) {
-	return "", 0
+func (ce *CPDoSExp) HMO(str string) (string, int) {
+	ce.preClear(ce.req.Get(ce.URL))
+	ce.req.Header.Set("X-HTTP-Method-Override", str)
+	ce.req.Header.Set("X-HTTP-Method", str)
+	ce.req.Header.Set("X-Method-Override", str)
+	return ce.formatResp(ce.req.End())
 }
 
 func (ce *CPDoSExp) formatResp(resp gorequest.Response, body string, errs []error) (string, int) {
